@@ -18,31 +18,42 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { versionKey: false, timestamps: true }
 );
 
 contactSchema.set("save", handleMongooseError);
 
-const addContact = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required().email(),
-  phone: Joi.string().required(),
+const add = Joi.object({
+  name: Joi.string().required().error(new Error("missing required name field")),
+  email: Joi.string()
+    .required()
+    .email()
+    .error(new Error("missing required name field")),
+  phone: Joi.string()
+    .required()
+    .error(new Error("missing required name field")),
+  favorite: Joi.boolean(),
 });
 
-const updateContact = Joi.object({
+const update = Joi.object({
   name: Joi.string(),
   email: Joi.string().email(),
   phone: Joi.string(),
+  favorite: Joi.boolean(),
 }).min(1);
 
 const updateFavorite = Joi.object({
   favorite: Joi.boolean().required(),
 });
 
-const schemas = {
-  addContact,
-  updateContact,
+const contactSchemas = {
+  add,
+  update,
   updateFavorite,
 };
 
@@ -50,5 +61,5 @@ const Contact = model("contact", contactSchema);
 
 module.exports = {
   Contact,
-  schemas,
+  contactSchemas,
 };
